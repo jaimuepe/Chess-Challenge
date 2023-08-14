@@ -7,6 +7,7 @@ namespace ChessChallenge.Application
     public class HumanPlayer
     {
         public event System.Action<Move>? MoveChosen;
+        public event System.Action? UndoLastMoves;
 
         readonly Board board;
         readonly BoardUI boardUI;
@@ -40,6 +41,16 @@ namespace ChessChallenge.Application
             {
                 return;
             }
+            
+            if (!isDragging)
+            {
+                if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE) || RightMousePressedThisFrame())
+                {
+                    UndoLastMoves?.Invoke();
+                    return;
+                }
+            }
+            
             Vector2 mouseScreenPos = Raylib.GetMousePosition();
             Vector2 mouseWorldPos = Program.ScreenToWorldPos(mouseScreenPos);
 

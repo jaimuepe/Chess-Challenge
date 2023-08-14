@@ -65,6 +65,12 @@ namespace ChessChallenge.Application
             }
         }
 
-
+        public void SubscribeToUndoMovesEventIfHuman(Action action)
+        {
+            if (Human != null)
+            {
+                Human.UndoLastMoves += action;
+            }
+        }
     }
 }

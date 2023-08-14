@@ -102,6 +102,9 @@ namespace ChessChallenge.Application
             PlayerBlack = CreatePlayer(blackType);
             PlayerWhite.SubscribeToMoveChosenEventIfHuman(OnMoveChosen);
             PlayerBlack.SubscribeToMoveChosenEventIfHuman(OnMoveChosen);
+            
+            PlayerWhite.SubscribeToUndoMovesEventIfHuman(UndoLastTwoMoves);
+            PlayerBlack.SubscribeToUndoMovesEventIfHuman(UndoLastTwoMoves);
 
             // UI Setup
             boardUI.UpdatePosition(board);
@@ -222,7 +225,42 @@ namespace ChessChallenge.Application
             string txt = reader.ReadToEnd();
             return TokenCounter.CountTokens(txt);
         }
+        
+        public void UndoLastTwoMoves()
+        {
+            UndoLastMoves(2);
 
+            if (PlayerToMove.IsHuman)
+            {
+                PlayerToMove.Human.SetPosition(FenUtility.CurrentFen(board));
+            }
+
+            if (PlayerNotOnMove.IsHuman)
+            {
+                PlayerNotOnMove.Human.SetPosition(FenUtility.CurrentFen(board));
+            }
+
+            if (board.AllGameMoves.Count > 0)
+            {
+                boardUI.UpdatePosition(board, board.AllGameMoves[^1], animate: false);
+            }
+            else
+            {
+                boardUI.UpdatePosition(board);
+                boardUI.ResetSquareColours();
+            }
+        }
+
+        void UndoLastMoves(int numberOfMovesToUndo)
+        {
+            numberOfMovesToUndo = Math.Min(numberOfMovesToUndo, board.AllGameMoves.Count);
+
+            for (int i = 0; i < numberOfMovesToUndo; i++)
+            {
+                board.UndoMove(board.AllGameMoves[^1], inSearch: false);
+            }
+        }
+        
         void OnMoveChosen(Move chosenMove)
         {
             if (IsLegal(chosenMove))
