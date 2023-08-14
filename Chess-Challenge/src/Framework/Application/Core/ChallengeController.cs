@@ -225,8 +225,8 @@ namespace ChessChallenge.Application
             string txt = reader.ReadToEnd();
             return TokenCounter.CountTokens(txt);
         }
-        
-        public void UndoLastTwoMoves()
+
+        private void UndoLastTwoMoves()
         {
             UndoLastMoves(2);
 
@@ -240,15 +240,8 @@ namespace ChessChallenge.Application
                 PlayerNotOnMove.Human.SetPosition(FenUtility.CurrentFen(board));
             }
 
-            if (board.AllGameMoves.Count > 0)
-            {
-                boardUI.UpdatePosition(board, board.AllGameMoves[^1], animate: false);
-            }
-            else
-            {
-                boardUI.UpdatePosition(board);
-                boardUI.ResetSquareColours();
-            }
+            var lastMove = board.AllGameMoves.Count > 0 ? board.AllGameMoves[^1] : new Move();
+            boardUI.UpdatePosition(board, lastMove, animate: false);
         }
 
         void UndoLastMoves(int numberOfMovesToUndo)
